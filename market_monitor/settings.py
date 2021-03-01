@@ -27,6 +27,9 @@ CELERY_BROKER_URL = "redis://:" + redis_pwd + "@" + redis_host + ":8410/15"
 CELERY_RESULT_BACKEND = "redis://:" + redis_pwd + "@" + redis_host + ":8410/14"
 CELERY_RESULT_SERIALIZER = 'json'
 
+CELERYD_MAX_TASKS_PER_CHILD = 2
+CELERY_ENABLE_UTC = False
+
 
 # CELERY_QUEUES = (
 #     Queue("default", Exchange("default"), routing_key = "default"),
@@ -76,6 +79,7 @@ INSTALLED_APPS = [
     'controllers.up_down_dis',
     'controllers.turnover_forecast',
     'controllers.up_down_forecast',
+    'controllers.cross',
 ]
 
 CELERY_IMPORTS = (
@@ -83,6 +87,7 @@ CELERY_IMPORTS = (
     'controllers.up_down_dis.tasks',
     'controllers.turnover_forecast.tasks',
     'controllers.up_down_forecast.tasks',
+    'controllers.cross.tasks',
 )
 
 MIDDLEWARE = [
