@@ -36,12 +36,12 @@ logger = logging.getLogger(__name__)
 
 
 
-class UpDownForecastMaster(BaseMasterTask, Base):
+class CrossMaster(BaseMasterTask, Base):
     """
         金叉死叉预警
     """
     def __init__(self):
-        super(UpDownForecastMaster, self).__init__()
+        super(CrossMaster, self).__init__()
         self.job_status = False
         self._redis_client_key = "redis_1_6"
         self.job_name = 'market_monitor#T_MARKET_STATUS'
@@ -176,8 +176,8 @@ class UpDownForecastMaster(BaseMasterTask, Base):
                                      actual_fields, data_list)
 
 
-change_info_master = celery_app.register_task(UpDownForecastMaster())
+change_info_master = celery_app.register_task(CrossMaster())
 
 if __name__ == '__main__':
     date_str = "2020-10-23"
-    UpDownForecastMaster().run()
+    CrossMaster().run()
