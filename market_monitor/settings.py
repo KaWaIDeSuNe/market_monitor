@@ -121,11 +121,11 @@ WSGI_APPLICATION = 'market_monitor.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get("DB_NAME", "scheduler"),
+        "NAME": os.environ.get("DB_NAME", "celery"),
         "USER": os.environ.get("DB_USER", "root"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "Tom&Jerry"),
-        "HOST": os.environ.get("DB_HOST", "172.20.117.55"),
-        "PORT": os.environ.get("DB_PORT", "63306"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ".+FuckYou+*1*2.!"),
+        "HOST": os.environ.get("DB_HOST", "114.67.230.147"),
+        "PORT": os.environ.get("DB_PORT", "3306"),
     }
 }
 
