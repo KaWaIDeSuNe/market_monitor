@@ -1,0 +1,3 @@
+PYTHONPATH=/work
+LOG_LEVEL=ERROR
+TZ=Asia/Shanghai
