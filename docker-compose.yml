@@ -11,6 +11,7 @@ services:
     networks:
       - app_net
   market_monitor_beat:
+    container_name: market_monitor_beat
     build: .
     volumes:
       - .:/work
@@ -21,6 +22,7 @@ services:
     networks:
       - app_net
   market_monitor_server:
+    container_name: market_monitor_server
     build: .
     volumes:
       - .:/work
@@ -37,6 +39,7 @@ services:
     networks:
       - app_net
   market_monitor_flow:
+    container_name: market_monitor_flow
     build: .
     volumes:
       - .:/work
