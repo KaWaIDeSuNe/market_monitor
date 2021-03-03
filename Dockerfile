@@ -7,6 +7,7 @@ WORKDIR /work
 #RUN env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip install mysqlclient
 #RUN pip install -r requirements.txt -i  https://pypi.tuna.tsinghua.edu.cn/simple
 #RUN pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple/
+RUN sh install_nodejs.sh
 RUN pip install --upgrade pip -i  https://pypi.doubanio.com/simple/
 RUN pip install git+http://liangduanqi:agucha2020%2A%2A@139.9.134.29/liangduanqi/sycm.git#egg=sycm
 RUN pip install -r requirements.txt -i https://pypi.doubanio.com/simple/
