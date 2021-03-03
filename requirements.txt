@@ -45,4 +45,4 @@ celery==4.3.0
 numpy
 pandas
 tushare
-akshare
+akshare==0.6.10
