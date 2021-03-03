@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'controllers.turnover_forecast',
     'controllers.up_down_forecast',
     'controllers.cross',
+    'controllers.stock_model',
 ]
 
 CELERY_IMPORTS = (
@@ -88,6 +89,7 @@ CELERY_IMPORTS = (
     'controllers.turnover_forecast.tasks',
     'controllers.up_down_forecast.tasks',
     'controllers.cross.tasks',
+    'controllers.stock_model.tasks',
 )
 
 MIDDLEWARE = [

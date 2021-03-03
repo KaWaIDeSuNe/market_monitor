@@ -30,7 +30,7 @@ from docs.config.mysql_cfg.config import CONFIG
 from controllers.base_task.base_task import BaseMasterTask
 from utils.email_util import send_email
 
-log_setup('up_down_forecast')
+log_setup('cross')
 logger = logging.getLogger(__name__)
 
 
@@ -52,7 +52,6 @@ class CrossMaster(BaseMasterTask, Base):
             "600276",
             "002352",
             "000333",
-            "600779",
             "601012",
             "600600",
             "002241",
@@ -97,8 +96,6 @@ class CrossMaster(BaseMasterTask, Base):
         data_list = list()
         for code in self.__code_list:
             new_df = ts.get_realtime_quotes(code)
-
-            print(new_df)
             df = ts.get_hist_data(code, start='2020-08-01', end= date_str,
                                   ktype='D')
             # 提取收盘价
@@ -128,11 +125,10 @@ class CrossMaster(BaseMasterTask, Base):
             ma100 = talib.SMA(closed[::-1], timeperiod=100)[::-1]
             st_name = new_df["name"][0]
             cur_price = "%.2f" % float(new_df['price'][0])
+
             # flag =
             e_title = f"{st_name}/{code} ma5,ma10 金叉"
             msg = f"{st_name}当前价格为: {cur_price}"
-            # print(ma5)
-            # print(ma10)
             if ma5[0] > ma10[0] and ma5[1] < ma10[1]:
                 e_title = f"{st_name}/{code} ma5,ma10 金叉"
                 send_email(msg, e_title)
@@ -153,20 +149,70 @@ class CrossMaster(BaseMasterTask, Base):
             if ma30[0] < ma60[0] and ma30[1] > ma60[1]:
                 e_title = f"{st_name}/{code} ma30,ma60 死叉"
                 send_email(msg, e_title)
-            # send_email(msg, e_title)
+            closed_5 = closed[4]
+            closed_10 = closed[9]
+            closed_20 = closed[19]
+            closed_30 = closed[29]
+            closed_60 = closed[59]
+            diff_ratio_5 = self.__diff_ratio(cur_price, closed_5)
+            diff_ratio_10 = self.__diff_ratio(cur_price, closed_10)
+            diff_ratio_20 = self.__diff_ratio(cur_price, closed_20)
+            diff_ratio_30 = self.__diff_ratio(cur_price, closed_30)
+            diff_ratio_60 = self.__diff_ratio(cur_price, closed_60)
+            if diff_ratio_5 > 0.25:
+                e_title = f"{st_name}/{code} 较5日前交易日涨幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_5 * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，5日前价格为：{closed_5}, 涨幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_5 < -0.25:
+                e_title = f"{st_name}/{code} 较5日前交易日跌幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_5  * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，5日前价格为：{closed_5}, 跌幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_10 > 0.25:
+                e_title = f"{st_name}/{code} 较10日前交易日涨幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_10 * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，10日前价格为：{closed_10}, 涨幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_10 < -0.25:
+                e_title = f"{st_name}/{code} 较10日前交易日跌幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_10  * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，10日前价格为：{closed_10}, 跌幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_20 > 0.25:
+                e_title = f"{st_name}/{code} 较20日前交易日涨幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_20 * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，20日前价格为：{closed_20}, 涨幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_20 < -0.25:
+                e_title = f"{st_name}/{code} 较20日前交易日跌幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_20  * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，20日前价格为：{closed_20}, 跌幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_30 > 0.25:
+                e_title = f"{st_name}/{code} 较30日前交易日涨幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_30 * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，30日前价格为：{closed_30}, 涨幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_30 < -0.25:
+                e_title = f"{st_name}/{code} 较30日前交易日跌幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_30  * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，30日前价格为：{closed_30}, 跌幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_60 > 0.25:
+                e_title = f"{st_name}/{code} 较60日前交易日涨幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_60 * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，60日前价格为：{closed_60}, 涨幅为：{format_ratio}%"
+                send_email(msg, e_title)
+            if diff_ratio_60 < -0.25:
+                e_title = f"{st_name}/{code} 较60日前交易日跌幅超25%"
+                format_ratio = "%.2f" % (diff_ratio_60  * 100)
+                msg = f"{st_name}当前价格为: {cur_price}，60日前价格为：{closed_60}, 跌幅为：{format_ratio}%"
+                send_email(msg, e_title)
 
-        #     idx = len(vote_list)//2
-        #     vote_list.sort()
-        #     vote = vote_list[idx]
-        #     data = {
-        #         "TRADE_DATE": date_str,
-        #         "CODE": self.__code_map[code],
-        #         "NAME": self.__name_map[code],
-        #         "TREND_TYPE": vote,
-        #         "FINGER_ID": self._gen_graph_id([date_str, code]),
-        #     }
-        #     data_list.append(data)
-        # return data_list
+
+    def __diff_ratio(self, price1, price2):
+        return (float(price1) - float(price2)) / float(price1)
 
     @retry_on_deadlock_decorator
     def __save_data(self, data_list):

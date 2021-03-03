@@ -27,7 +27,7 @@ class EmailUtil(object):
         email_struct = MIMEText(email_content, _subtype="plain",
                                 _charset="gb2312")
         email_struct["Subject"] = email_title
-        email_struct["From"] = "".join(["Datax Err", "<", self.__mail_user, ">"])
+        email_struct["From"] = "".join(["市场预警", "<", self.__mail_user, ">"])
         email_struct["To"] = ";".join(self.__mail_to)
         # server = smtplib.SMTP()
         #linux
@@ -39,7 +39,7 @@ class EmailUtil(object):
         server.close()
 
 
-def send_email(err_info, email_title="datax job error ."):
+def send_email(err_info, email_title="市场预警测试邮件"):
     email_content = err_info
 
     email_util = EmailUtil()

@@ -48,5 +48,6 @@ app.conf.task_routes = {
     'controllers.turnover_forecast.tasks.*': {'queue': 'market_monitor'},
     'controllers.up_down_forecast.tasks.*': {'queue': 'market_monitor'},
     'controllers.cross.tasks.*': {'queue': 'market_monitor'},
+    'controllers.stock_model.tasks.*': {'queue': 'market_monitor'},
 }
 

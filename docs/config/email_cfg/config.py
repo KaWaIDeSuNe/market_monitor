@@ -9,8 +9,7 @@ MailInfo = namedtuple('MailInfo',
                       ['mail_host', 'mail_user', 'mail_pass', 'mail_to'])
 
 mail_info = MailInfo(
-    "smtp.qq.com", "liangduanqi@qq.com", "rghuwlnvadngggcc",
+    "smtp.163.com", "15611213733@163.com", "UXQAKNOQFZSJMTUO",
     [
     "liangduanqi@qq.com",
-    "1032290763@qq.com"
     ])
