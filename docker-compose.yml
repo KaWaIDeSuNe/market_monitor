@@ -38,23 +38,23 @@ services:
       replicas: 1
     networks:
       - app_net
-  market_monitor_flow:
-    container_name: market_monitor_flow
-    build: .
-    volumes:
-      - .:/work
-      - ./log:/log
-    env_file:
-      - docs/proj_env/env.list
-    command:  flower -A market_monitor --port=5555
-    ports:
-      - 5558:5555
-    deploy:
-      restart_policy:
-        condition: on-failure
-      replicas: 1
-    networks:
-      - app_net
+#  market_monitor_flow:
+#    container_name: market_monitor_flow
+#    build: .
+#    volumes:
+#      - .:/work
+#      - ./log:/log
+#    env_file:
+#      - docs/proj_env/env.list
+#    command:  flower -A market_monitor --port=5555
+#    ports:
+#      - 5558:5555
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#      replicas: 1
+#    networks:
+#      - app_net
 
 networks:
   app_net:
