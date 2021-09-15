@@ -12,4 +12,6 @@ mail_info = MailInfo(
     "smtp.163.com", "15611213733@163.com", "UXQAKNOQFZSJMTUO",
     [
     "liangduanqi@qq.com",
+    # "13375132375@163.com",
+    # "18600398364@163.com"
     ])

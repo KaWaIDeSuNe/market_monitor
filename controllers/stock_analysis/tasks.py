@@ -6,18 +6,17 @@
 # Date: 2020-04-01 15:14
 
 import re
-import math
 import logging
 from datetime import datetime
 
-from celery import Task
-from celery import group
-from bson.objectid import ObjectId
-from celery.result import allow_join_result
+# from celery import Task
+# from celery import group
+# from bson.objectid import ObjectId
+# from celery.result import allow_join_result
 import tushare as ts
 import akshare as ak
 import talib
-from sqlalchemy import text
+# from sqlalchemy import text
 import numpy as np
 import pandas as pd
 pd.set_option("display.max_columns", None)
@@ -45,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 class StockModelMaster(BaseMasterTask, Base):
     """
-        均线选股模型
+        个股技术分析
     """
     def __init__(self):
         super(StockModelMaster, self).__init__()
@@ -54,6 +53,13 @@ class StockModelMaster(BaseMasterTask, Base):
         self.job_name = 'market_monitor#T_MARKET_STATUS'
         self._db = "agucha"
         self._table = "T_STOCK_TREND"
+        self.code_map = {
+            "000915": "",
+            # "600763": "通策医疗",
+            # "601318": "中国平安",
+            # "600132": "重庆啤酒",
+            # "300782": "卓胜微",
+        }
 
     def run(self, during=None, number=None, date_str = None):
         try:
@@ -72,29 +78,22 @@ class StockModelMaster(BaseMasterTask, Base):
     def data_process(self, date_str):
         # 1. 获取A股股票列表(过滤创业板和科创板)
         # 2. 求均值
-        df = ak.stock_zh_a_spot_em()
-        data_list = list()
-        for _, row in df.iterrows():
-            code = row["代码"]
-            st_name = row["名称"]
-            trade = row["昨收"]
-            changepercent = row["涨跌幅"]
-            high = row["最高"]
-            low = row["最低"]
-            is_man = math.isnan(changepercent)
-            # print(code)
-            if is_man:
-                continue
+        for st_code in self.code_map:
+
+            df = ts.get_realtime_quotes(symbols = st_code)
+            row = df.loc[0]
+            code = row["code"]
+            st_name = row["name"]
+            trade = float(row["price"])
+            high = row["high"]
+            low = row["low"]
             if high == low:
                 '''最高价与最低价相同，可能为停牌'''
                 continue
             if code.startswith("688"):
                 '''过滤科创板'''
                 continue
-            import time
-            s = time.time()
-            his_df = ak.stock_zh_a_hist(code, start_date='20210101', adjust="qfq")
-            # print(time.time()-s)
+            his_df = ak.stock_zh_a_hist(st_code, start_date='2021-01-01', end_date= date_str, adjust="qfq")
             if his_df is None:
                 continue
             if his_df.empty:
@@ -112,31 +111,31 @@ class StockModelMaster(BaseMasterTask, Base):
             ma60 = talib.SMA(closed, timeperiod=60)[::-1]
             ma120 = talib.SMA(closed, timeperiod=120)[::-1]
             MACD, MACDsignal,  MACDhist = talib.MACD(closed)
-            dif = MACD[::-1]
-            dea = MACDsignal[::-1]
-            depth = MACDhist[::-1]
+            print(f"ma5:{ma5}")
+            print(f"ma10:{ma10}")
+            # print(f"MACD:{MACD[::-1]}")
+            # print(f"MACDsignal:{MACDsignal[::-1]}")
+            # print(f"MACDhist:{MACDhist[::-1]}")
 
+
+            # print(f"st_name:{st_name}")
+            # print(f"trade:{trade}")
+            # print(f"ma5:{ma5}")
+            # print(f"ma10:{ma10}")
+            e_title = f"{st_name}/{code}\n"
             msg = f"{st_name}当前价格为: {trade}\n"
             msg += f"详情页面：http://quote.eastmoney.com/{code}.html\n"
-            msg += f"DIF: {dif[0]}; DEA:{dea[0]}; dep:{depth[0]}"
-
-            if ma30[0] > ma60[0] and ma30[1] < ma60[1] and ma5[0] > ma10[0] and ma5[1] < ma10[1] and changepercent < 9.5:
-                e_title = f"{st_name}/{code} ma5,ma10 金叉;ma30,ma60 金叉 涨跌幅：{changepercent}%"
-                send_email(msg, e_title)
-            if trade > ma5[0] > ma10[0] > ma20[0] > ma30[0] > ma60[0] > ma120[0] and ma5[0] > ma10[0] and ma5[1] < ma10[1] and changepercent < 9.5:
-                e_title = f"{st_name}/{code} ma5,ma10 金叉; 均线多头排列 涨跌幅：{changepercent}%"
-
-                send_email(msg, e_title)
-            # if dif[0] > 0 and depth[0] > 0 and depth[1] < 0:
-            #     e_title = f"{st_name}/{code} 水上MACD 金叉; 涨跌幅：{changepercent}%"
-            #     send_email(msg, e_title)
-            # if dif[0] > 0 and dif[1] < 0 and dif[0] > dea[0]:
-            #     e_title = f"{st_name}/{code} DIF上穿水面; 涨跌幅：{changepercent}%"
-            #     send_email(msg, e_title)
-            # if dea[0] > 0 and dea[1] < 0 and dif[0] > dea[0]:
-            #     e_title = f"{st_name}/{code} DEA上穿水面; 涨跌幅：{changepercent}%"
-            #     send_email(msg, e_title)
-
+            if ma5[0] < ma10[0] and ma5[1] > ma10[1]:
+                msg += "ma5,ma10 死叉\n"
+            if ma5[0] < ma10[0] < ma20[0]:
+                msg += "均线空头排列\n"
+            if trade < ma5[0] and closed[1] > ma5[1]:
+                msg += "跌破5日均线\n"
+            if trade < ma10[0] and closed[1] > ma10[1]:
+                msg += "跌破10日均线\n"
+            if trade < ma20[0] and closed[1] > ma20[1]:
+                msg += "跌破20日均线\n"
+            # send_email(msg, e_title)
 
 
     @retry_on_deadlock_decorator
@@ -146,12 +145,9 @@ class StockModelMaster(BaseMasterTask, Base):
         self.batch_upsert_by_raw_sql(self._db, self._table, fields,
                                      actual_fields, data_list)
 
+
 change_info_master = celery_app.register_task(StockModelMaster())
 
 if __name__ == '__main__':
-    # date_str = "2020-10-23"
-    # StockModelMaster().run()
-    his_df = ak.stock_zh_a_hist("000001", start_date='20210101', adjust="qfq")
-    print(his_df)
-
-    # 605589
+    date_str = "2020-10-23"
+    StockModelMaster().run()
